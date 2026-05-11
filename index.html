@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Road Trip Planner</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+    rel="icon"
+    type="image/png"
+    href="assets/favicon/favicon.ico"
+/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <!-- Background Blurs -->
+    <div class="blur blur1"></div>
+    <div class="blur blur2"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">🚗 Road Trip Planner</div>
+
+       <div class="auth-section">
+
+    <button
+        id="loginBtn"
+        class="primary-btn"
+    >
+        Sign in with Google
+    </button>
+
+    <div
+        id="userProfile"
+        class="hidden"
+    >
+
+        <img id="userAvatar">
+
+        <span id="userName"></span>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+</div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Plan Your Next Road Adventure</h1>
+        <p>
+            Calculate fuel costs, travel time, weather, and budget instantly.
+        </p>
+    </section>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Planner Card -->
+        <section class="card planner-card">
+
+            <h2>Trip Details</h2>
+
+            <div class="input-group">
+                <label>Starting Location</label>
+                <input type="text" id="startLocation" placeholder="e.g. Mumbai" />
+            </div>
+
+            <div class="input-group">
+                <label>Destination</label>
+                <input type="text" id="destination" placeholder="e.g. Goa" />
+            </div>
+
+            <!-- Stops Container -->
+
+<div id="stopsContainer"></div>
+
+<button
+    type="button"
+    id="addStopBtn"
+    class="secondary-btn"
+>
+    + Add Stop
+</button>
+
+            <div class="input-group">
+                <label>Vehicle Mileage (km/l)</label>
+                <input type="number" id="mileage" placeholder="e.g. 18" />
+            </div>
+
+            <div class="input-group">
+                <label>Fuel Price per Liter (₹)</label>
+                <input type="number" id="fuelPrice" placeholder="e.g. 105" />
+            </div>
+
+            <div class="input-group">
+                <label>Trip Budget (Optional)</label>
+                <input type="number" id="budget" placeholder="e.g. 10000" />
+            </div>
+
+            <button id="planTripBtn" class="primary-btn">
+    <span id="btnText">Plan Trip</span>
+    <span id="loader" class="loader hidden"></span>
+</button>
+
+        </section>
+
+        <!-- Map -->
+        <section class="card map-card">
+            <h2>Route Map</h2>
+
+            <div id="map"></div>
+        </section>
+
+        <p class="map-note">
+    Route and trip insights will appear here after planning.
+</p>
+
+        <!-- Results -->
+        <section class="results-grid">
+
+            <div class="card result-card">
+                <h3>📍 Distance</h3>
+                <p id="distanceResult">--</p>
+            </div>
+
+            <div class="card result-card">
+                <h3>⏱ Travel Time</h3>
+                <p id="timeResult">--</p>
+            </div>
+
+            <div class="card result-card">
+                <h3>⛽ Fuel Needed</h3>
+                <p id="fuelNeededResult">--</p>
+            </div>
+
+            <div class="card result-card">
+                <h3>💰 Fuel Cost</h3>
+                <p id="fuelCostResult">--</p>
+            </div>
+
+            <div class="card result-card">
+                <h3>💵 Remaining Budget</h3>
+                <p id="budgetResult">--</p>
+            </div>
+
+        </section>
+
+        <!-- Weather -->
+        <section class="card weather-card">
+
+            <h2>Destination Weather</h2>
+
+            <div id="weatherInfo">
+                <p>Weather data will appear here.</p>
+            </div>
+
+        </section>
+
+        <!-- Notes & Checklist -->
+        <section class="extras-section">
+
+            <!-- Checklist -->
+            <div class="card checklist-card">
+
+                <h2>🧳 Packing Checklist</h2>
+
+                <div class="checklist">
+                    <label><input type="checkbox"> Water Bottle</label>
+                    <label><input type="checkbox"> Charger</label>
+                    <label><input type="checkbox"> First Aid Kit</label>
+                    <label><input type="checkbox"> Driving License</label>
+                    <label><input type="checkbox"> Snacks</label>
+                </div>
+
+            </div>
+
+            <!-- Notes -->
+            <div class="card notes-card">
+
+                <h2>📝 Trip Notes</h2>
+
+                <textarea
+                    id="tripNotes"
+                    placeholder="Write your travel notes here..."
+                ></textarea>
+
+                <button id="saveNotesBtn" class="secondary-btn">
+                    Save Notes
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- Recent Trips -->
+        <section class="card recent-trips-card">
+
+            <h2>🕒 Recent Trips</h2>
+
+            <ul id="recentTrips">
+                <li>No trips planned yet.</li>
+            </ul>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built with ❤️ using HTML, CSS & JavaScript</p>
+    </footer>
+
+
+
+    <!-- JS Files -->
+     <!-- Firebase -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- Google Maps API -->
+
+<script
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+</script>
+
+
+<!-- Firebase SDK -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<!-- Firebase Config -->
+
+<script src="js/firebase.js"></script>
+
+
+<!-- App Modules -->
+
+<script src="js/api.js"></script>
+
+<script src="js/storage.js"></script>
+
+<script src="js/ui.js"></script>
+
+
+<!-- Auth -->
+
+<script src="js/auth.js"></script>
+
+
+<!-- Main App -->
+
+<script src="js/app.js"></script>
+<script
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAy12Tz95BQtDtQbcIbTA85Ei1ETaY3h-Q&libraries=places">
+</script>
+
+</body>
+</html>

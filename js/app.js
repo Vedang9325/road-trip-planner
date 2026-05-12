@@ -460,7 +460,14 @@ const geocoder =
     location: midpoint
 },
 
-(results, status) => {
+async (results, status) => {
+
+    if (status !== "OK") {
+
+        console.log("Geocoder failed");
+
+        return;
+    }
 
     const cityResult =
     results.find(result =>
@@ -480,6 +487,15 @@ const haltCity =
 
 console.log(haltCity);
 
+const breakCity =
+    cityResult.formatted_address;
+
+console.log(breakCity);
+
+const weatherData =
+    await getWeather(breakCity);
+
+console.log(weatherData);
 
 const hotelRequest = {
 
@@ -554,12 +570,7 @@ document.getElementById(
     }
 );
 
-    if (status !== "OK") {
 
-        console.log("Geocoder failed");
-
-        return;
-    }
 });
 const fastestRoute =
     parsedRoutes.reduce((prev, current) =>
@@ -708,21 +719,25 @@ document.getElementById(
     "break-recommendation-container"
 ).innerHTML = "";
 
+document.getElementById(
+    "route-weather-container"
+).innerHTML = "";
+
 breakPoints.forEach(point => {
 
     breakGeocoder.geocode(
-    {
-        location: point
-    },
+{
+    location: point
+},
 
-    (results, status) => {
+async (results, status) => {
 
-        if (
-            status !== "OK"
-        ) {
+        if (status !== "OK") {
 
-            return;
-        }
+        console.log("Geocoder failed");
+
+        return;
+    }
 
         const cityResult =
             results.find(result =>
@@ -740,6 +755,88 @@ breakPoints.forEach(point => {
 
             return;
         }
+const breakCity =
+    cityResult.formatted_address;
+
+const weatherData =
+    await getWeather(breakCity);
+
+if (!weatherData) {
+
+    return;
+}
+
+if (
+    !weatherData
+    ||
+    !weatherData.weather
+    ||
+    !weatherData.weather[0]
+) {
+
+    return;
+}
+
+const condition =
+    weatherData.weather[0]
+        .main
+        .toLowerCase();
+
+const temperature =
+    weatherData.main.temp;
+console.log(condition);
+console.log(temperature);
+let warning = "";
+let emoji = "";
+
+if (condition.includes("rain")) {
+
+    emoji = "🌧";
+
+    warning =
+        "Heavy rain possible on this stretch.";
+}
+
+else if (condition.includes("fog")) {
+
+    emoji = "🌫";
+
+    warning =
+        "Low visibility risk due to fog.";
+}
+
+else if (temperature >= 35) {
+
+    emoji = "🥵";
+
+    warning =
+        "Extreme heat expected.";
+}
+
+if (warning !== "") {
+
+    document.getElementById(
+        "route-weather-container"
+    ).innerHTML += `
+
+        <div class="weather-warning-card">
+
+            <h3>
+                ${emoji} Route Weather Alert
+            </h3>
+
+            <p>
+                📍 ${breakCity}
+            </p>
+
+            <p>
+                ${warning}
+            </p>
+
+        </div>
+    `;
+}
+
 
 document.getElementById(
     "break-recommendation-container"

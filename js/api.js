@@ -15,10 +15,20 @@ async function getWeather(city) {
     try {
 
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric`
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`
         );
 
-        const data = await response.json();
+        if (!response.ok) {
+
+            console.log(
+                "Weather API request failed"
+            );
+
+            return null;
+        }
+
+        const data =
+            await response.json();
 
         return data;
 

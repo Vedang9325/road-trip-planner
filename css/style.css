@@ -1181,3 +1181,31 @@ width: 320px;
 
     transform: translateX(2px);
 }
+
+#route-weather-container {
+
+    margin-top: 28px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 18px;
+}
+
+.weather-warning-card {
+
+    background: rgba(255,255,255,0.08);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    min-width: 260px;
+
+    color: white;
+
+    backdrop-filter: blur(12px);
+}

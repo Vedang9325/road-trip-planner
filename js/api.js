@@ -23,9 +23,9 @@ async function getWeather(lat, lng) {
 
         if (!response.ok) {
 
-            console.log(
-                "Weather API request failed"
-            );
+            console.error(
+    "Weather API request failed"
+);
 
             return null;
         }

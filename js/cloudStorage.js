@@ -27,7 +27,7 @@ async function saveTripToCloud(tripData) {
                     firebase.firestore.FieldValue.serverTimestamp()
             });
 
-        console.log("Trip saved.");
+        console.info("Trip saved.");
         loadCloudTrips();
 
     } catch (error) {

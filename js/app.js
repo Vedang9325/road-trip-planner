@@ -397,8 +397,6 @@ directionsService.route(
 
 async (result, status) => {
 
-    console.log("callback running");
-    console.log(status);
 
     if (status !== "OK") {
 
@@ -440,8 +438,7 @@ return {
 };
     });
 
-    console.log(parsedRoutes);
-    console.log(parsedRoutes[0].overviewPath);
+
     const midpointIndex =
     Math.floor(
         parsedRoutes[0]
@@ -452,7 +449,6 @@ const midpoint =
     parsedRoutes[0]
         .overviewPath[midpointIndex];
 
-console.log(midpoint);
 const geocoder =
     new google.maps.Geocoder();
     geocoder.geocode(
@@ -464,7 +460,7 @@ async (results, status) => {
 
     if (status !== "OK") {
 
-        console.log("Geocoder failed");
+        console.error("Geocoder failed");
 
         return;
     }
@@ -481,25 +477,22 @@ async (results, status) => {
         )
     );
 
-console.log(cityResult);
+
 const haltCity =
     cityResult.address_components[0]
         .long_name;
 
-console.log(haltCity);
 
 const breakCity =
     cityResult.address_components[0]
         .long_name;
 
-console.log(breakCity);
 const weatherData =
 await getWeather(
     midpoint.lat(),
     midpoint.lng()
 )
 
-console.log(weatherData);
 
 const hotelRequest = {
 
@@ -518,14 +511,14 @@ placesService.findPlaceFromQuery(
 
     (results, status) => {
 
-        console.log(results);
+
 
         if (
             status !==
             google.maps.places.PlacesServiceStatus.OK
         ) {
 
-            console.log("Hotel search failed");
+            console.error("Hotel search failed");
 
             return;
         }
@@ -689,7 +682,6 @@ if (firstCard) {
 const recommendedBreaks =
     Math.floor(totalDurationHours / 4);
 
-console.log(recommendedBreaks);
 
 const breakPoints = [];
 
@@ -714,7 +706,6 @@ for (
     );
 }
 
-console.log(breakPoints);
 
 const breakGeocoder =
     new google.maps.Geocoder();
@@ -738,7 +729,7 @@ async (results, status) => {
 
         if (status !== "OK") {
 
-        console.log("Geocoder failed");
+        console.error("Geocoder failed");
 
         return;
     }
@@ -792,8 +783,6 @@ const condition =
 
 const temperature =
     weatherData.main.temp;
-console.log(condition);
-console.log(temperature);
 let warning = "";
 let emoji = "";
 

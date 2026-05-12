@@ -386,82 +386,417 @@ stopInputs.forEach((input) => {
 ========================= */
 
 directionsService.route(
+{
+    origin: startLocation,
+    destination: destination,
+    waypoints: waypoints,
+    optimizeWaypoints: true,
+    travelMode: google.maps.TravelMode.DRIVING,
+    provideRouteAlternatives: true
+},
+
+async (result, status) => {
+
+    console.log("callback running");
+    console.log(status);
+
+    if (status !== "OK") {
+
+        alert("Could not generate route.");
+
+        hideLoading();
+
+        return;
+    }
+
+    const routes = result.routes;
+
+    const parsedRoutes = routes.map((route, index) => {
+
+        const leg = route.legs[0];
+
+return {
+    id: index,
+    label: index === 0 ? "Fastest" : `Alternative ${index}`,
+    overviewPath: route.overview_path,
+
+    distanceKm: Math.round(leg.distance.value / 1000),
+
+    durationMin: Math.round(leg.duration.value / 60),
+
+    durationText: leg.duration.text,
+
+    fuelNeeded: (
+        Math.round(leg.distance.value / 1000) / mileage
+    ).toFixed(1),
+
+    fuelCost: (
+        (
+            Math.round(leg.distance.value / 1000) / mileage
+        ) * fuelPrice
+    ).toFixed(0),
+
+    summary: route.summary
+};
+    });
+
+    console.log(parsedRoutes);
+    console.log(parsedRoutes[0].overviewPath);
+    const midpointIndex =
+    Math.floor(
+        parsedRoutes[0]
+            .overviewPath.length / 2
+    );
+
+const midpoint =
+    parsedRoutes[0]
+        .overviewPath[midpointIndex];
+
+console.log(midpoint);
+const geocoder =
+    new google.maps.Geocoder();
+    geocoder.geocode(
+{
+    location: midpoint
+},
+
+(results, status) => {
+
+    const cityResult =
+    results.find(result =>
+
+        result.types.includes("locality")
+
+        ||
+
+        result.types.includes(
+            "administrative_area_level_2"
+        )
+    );
+
+console.log(cityResult);
+const haltCity =
+    cityResult.formatted_address;
+
+console.log(haltCity);
+
+
+const hotelRequest = {
+
+    query: `best hotels in ${haltCity}`,
+
+    fields: [
+        "name",
+        "rating",
+        "formatted_address",
+        "geometry"
+    ]
+};
+
+placesService.findPlaceFromQuery(
+    hotelRequest,
+
+    (results, status) => {
+
+        console.log(results);
+
+        if (
+            status !==
+            google.maps.places.PlacesServiceStatus.OK
+        ) {
+
+            console.log("Hotel search failed");
+
+            return;
+        }
+        document.getElementById(
+    "halt-recommendation-container"
+).innerHTML = "";
+        const hotel =
+    results[0];
+    const hotelLat =
+    hotel.geometry.location.lat();
+
+const hotelLng =
+    hotel.geometry.location.lng();
+
+const mapsUrl =
+    `https://www.google.com/maps/search/?api=1&query=${hotelLat},${hotelLng}`;
+
+document.getElementById(
+    "halt-recommendation-container"
+).innerHTML = `
+
+    <div class="halt-card">
+
+        <h2>
+            🌙 Recommended Overnight Halt
+        </h2>
+
+        <p>
+            📍 ${haltCity}
+        </p>
+
+        <a
+    href="${mapsUrl}"
+    target="_blank"
+    class="hotel-link"
+>
+    🏨 ${hotel.name}
+</a>
+
+        <p>
+            ⭐ ${hotel.rating || "N/A"}
+        </p>
+
+    </div>
+`;
+    }
+);
+
+    if (status !== "OK") {
+
+        console.log("Geocoder failed");
+
+        return;
+    }
+});
+const fastestRoute =
+    parsedRoutes.reduce((prev, current) =>
+        prev.durationMin < current.durationMin
+            ? prev
+            : current
+    );
+
+const shortestRoute =
+    parsedRoutes.reduce((prev, current) =>
+        prev.distanceKm < current.distanceKm
+            ? prev
+            : current
+    );
+
+const cheapestRoute =
+    parsedRoutes.reduce((prev, current) =>
+        parseFloat(prev.fuelCost) < parseFloat(current.fuelCost)
+            ? prev
+            : current
+    );
+
+parsedRoutes.forEach(route => {
+
+    route.label = "";
+
+    if (route.id === fastestRoute.id) {
+        route.label += "⚡ Fastest ";
+    }
+
+    if (route.id === shortestRoute.id) {
+        route.label += "📏 Shortest ";
+    }
+
+    if (route.id === cheapestRoute.id) {
+        route.label += "💰 Cheapest ";
+    }
+
+    if (route.label === "") {
+        route.label = "Alternative";
+    }
+});
+    document.getElementById("route-comparison-container").innerHTML =
+        parsedRoutes.map(route => `
+            <div
+    class="route-card"
+    data-route-id="${route.id}"
+>
+                <h3>${route.label}</h3>
+                <p>🛣 ${route.distanceKm} km</p>
+
+<p>⏱ ${route.durationText}</p>
+
+<p>⛽ ${route.fuelNeeded} L</p>
+
+<p>💰 ₹${route.fuelCost}</p>
+
+<p>📍 ${route.summary}</p>
+            </div>
+        `).join('');
+document
+    .querySelectorAll(".route-card")
+    .forEach(card => {
+
+        card.addEventListener("click", () => {
+
+            const selectedId =
+                parseInt(
+                    card.dataset.routeId
+                );
+
+            document
+                .querySelectorAll(".route-card")
+                .forEach(c =>
+                    c.classList.remove("selected-route")
+                );
+
+            card.classList.add("selected-route");
+
+            directionsRenderer.setRouteIndex(
+                selectedId
+            );
+        });
+    });
+
+    const firstCard =
+    document.querySelector(".route-card");
+
+if (firstCard) {
+
+    firstCard.classList.add(
+        "selected-route"
+    );
+}
+
+    directionsRenderer.setDirections(result);
+
+    const legs = routes[0].legs;
+
+    let totalDistance = 0;
+    let totalDuration = 0;
+
+    legs.forEach((leg) => {
+
+        totalDistance += leg.distance.value;
+        totalDuration += leg.duration.value;
+    });
+
+    const totalDurationHours =
+    totalDuration / 3600;
+
+const recommendedBreaks =
+    Math.floor(totalDurationHours / 4);
+
+console.log(recommendedBreaks);
+
+const breakPoints = [];
+
+for (
+    let i = 1;
+    i <= recommendedBreaks;
+    i++
+) {
+
+    const checkpointIndex =
+        Math.floor(
+            (
+                i / (recommendedBreaks + 1)
+            ) *
+            parsedRoutes[0]
+                .overviewPath.length
+        );
+
+    breakPoints.push(
+        parsedRoutes[0]
+            .overviewPath[checkpointIndex]
+    );
+}
+
+console.log(breakPoints);
+
+const breakGeocoder =
+    new google.maps.Geocoder();
+
+document.getElementById(
+    "break-recommendation-container"
+).innerHTML = "";
+
+breakPoints.forEach(point => {
+
+    breakGeocoder.geocode(
     {
-        origin: startLocation,
-
-        destination: destination,
-
-        waypoints: waypoints,
-
-        optimizeWaypoints: true,
-
-        travelMode:
-            google.maps.TravelMode.DRIVING
+        location: point
     },
 
+    (results, status) => {
 
-            async (result, status) => {
+        if (
+            status !== "OK"
+        ) {
 
-                if (
-                    status !== "OK"
-                ) {
+            return;
+        }
 
-                    alert("Could not generate route.");
+        const cityResult =
+            results.find(result =>
 
-                    hideLoading();
+                result.types.includes("locality")
 
-                    return;
-                }
+                ||
 
-                directionsRenderer.setDirections(result);
+                result.types.includes(
+                    "administrative_area_level_2"
+                )
+            );
 
-                const legs =
-    result.routes[0].legs;
+        if (!cityResult) {
 
-let totalDistance = 0;
+            return;
+        }
 
-let totalDuration = 0;
+document.getElementById(
+    "break-recommendation-container"
+).innerHTML += `
 
-legs.forEach((leg) => {
+    <div class="break-card">
 
-    totalDistance += leg.distance.value;
+        <h3>
+            ☕ Suggested Break Stop
+        </h3>
 
-    totalDuration += leg.duration.value;
+        <a
+    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityResult.formatted_address)}"
+    target="_blank"
+    class="break-link"
+>
+    📍 ${cityResult.formatted_address}
+</a>
+
+    </div>
+`;
+    });
 });
 
-const distanceKm =
-    (totalDistance / 1000).toFixed(1);
+    const distanceKm =
+        (totalDistance / 1000).toFixed(1);
 
-const durationText =
-    formatDuration(totalDuration);
+    const durationText =
+        formatDuration(totalDuration);
 
-                const fuelNeeded =
-                    (
-                        distanceKm / mileage
-                    ).toFixed(2);
+    const fuelNeeded =
+        (
+            distanceKm / mileage
+        ).toFixed(2);
 
-                const fuelCost =
-                    (
-                        fuelNeeded * fuelPrice
-                    ).toFixed(2);
+    const fuelCost =
+        (
+            fuelNeeded * fuelPrice
+        ).toFixed(2);
 
-                let remainingBudget = null;
+    let remainingBudget = null;
 
-                if (budget !== null) {
+    if (budget !== null) {
 
-                    remainingBudget =
-                        (
-                            budget - fuelCost
-                        ).toFixed(2);
-                }
+        remainingBudget =
+            (
+                budget - fuelCost
+            ).toFixed(2);
+    }
 
-                updateTripResults(
-    distanceKm,
-    durationText,
-    fuelNeeded,
-    fuelCost,
-    remainingBudget
-);
+    updateTripResults(
+        distanceKm,
+        durationText,
+        fuelNeeded,
+        fuelCost,
+        remainingBudget
+    );
 
 
 /* =========================
@@ -621,6 +956,7 @@ function generateFatigueAlert(
     const hours =
         durationSeconds / 3600;
 
+    
 
     if (hours >= 8) {
 

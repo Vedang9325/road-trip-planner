@@ -6,6 +6,31 @@
 
     <title>Road Trip Planner</title>
 
+    <meta
+http-equiv="Content-Security-Policy"
+content="
+default-src 'self';
+script-src 'self' 'unsafe-inline'
+https://maps.googleapis.com
+https://maps.gstatic.com
+https://cdnjs.cloudflare.com
+https://www.gstatic.com
+https://www.googleapis.com;
+
+style-src 'self' 'unsafe-inline'
+https://fonts.googleapis.com;
+
+font-src
+https://fonts.gstatic.com;
+
+img-src 'self' data: https:;
+
+connect-src 'self'
+https://api.openweathermap.org
+https://firestore.googleapis.com
+https://maps.googleapis.com
+https://identitytoolkit.googleapis.com;
+">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -264,12 +289,24 @@
 
         </section>
 
-        <button
-    id="saveTripBtn"
-    class="primary-btn"
->
-    Save Trip
-</button>
+<div class="save-section">
+
+    <button id="saveTripBtn">
+        Save Trip
+    </button>
+
+    <label class="privacy-toggle">
+
+        <input
+            type="checkbox"
+            id="privacyMode"
+        >
+
+        🔒 Privacy Mode
+
+    </label>
+
+</div>
 <div id="route-comparison-container"></div>
 
 <div id="halt-recommendation-container"></div>
@@ -278,10 +315,19 @@
 
 <div id="route-weather-container"></div>
 
-<button id="exportPdfBtn">
-    Export Trip PDF
-</button>
+<div id="packing-checklist-container"></div>
 
+<div class="action-buttons">
+
+    <button id="exportPdfBtn">
+        Export Trip PDF
+    </button>
+
+    <button id="shareTripBtn">
+        Share Trip Link
+    </button>
+
+</div>
 <!-- =========================
      SAVED TRIPS
 ========================= -->

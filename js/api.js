@@ -10,13 +10,16 @@ const WEATHER_API_KEY =
    WEATHER FUNCTION
 ========================= */
 
-async function getWeather(city) {
+async function getWeather(lat, lng) {
 
     try {
 
-        const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`
-        );
+        const response =
+            await fetch(
+
+`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${WEATHER_API_KEY}&units=metric`
+
+            );
 
         if (!response.ok) {
 
@@ -32,7 +35,9 @@ async function getWeather(city) {
 
         return data;
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 

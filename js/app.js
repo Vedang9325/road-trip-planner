@@ -483,17 +483,21 @@ async (results, status) => {
 
 console.log(cityResult);
 const haltCity =
-    cityResult.formatted_address;
+    cityResult.address_components[0]
+        .long_name;
 
 console.log(haltCity);
 
 const breakCity =
-    cityResult.formatted_address;
+    cityResult.address_components[0]
+        .long_name;
 
 console.log(breakCity);
-
 const weatherData =
-    await getWeather(breakCity);
+await getWeather(
+    midpoint.lat(),
+    midpoint.lng()
+)
 
 console.log(weatherData);
 
@@ -756,10 +760,14 @@ async (results, status) => {
             return;
         }
 const breakCity =
-    cityResult.formatted_address;
+    cityResult.address_components[0]
+        .long_name;
 
 const weatherData =
-    await getWeather(breakCity);
+    await getWeather(
+        midpoint.lat(),
+        midpoint.lng()
+    );
 
 if (!weatherData) {
 
@@ -936,12 +944,20 @@ loadRestaurants(
                     `${distanceKm} km`
                 );
 
-                const weatherData =
-                    await getWeather(destination);
+               const destinationLocation =
+    routes[0].legs[0].end_location;
 
+const weatherData =
+    await getWeather(
+        destinationLocation.lat(),
+        destinationLocation.lng()
+    );
                 if (weatherData) {
 
                     updateWeatherUI(weatherData);
+                    generatePackingChecklist(
+        weatherData
+    );
                 }
 
                 hideLoading();
@@ -963,7 +979,82 @@ loadRestaurants(
    START MAP
 ========================= */
 
-window.onload = initMap;
+window.onload = () => {
+
+    initMap();
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const start =
+        params.get("start");
+
+    const destination =
+        params.get("destination");
+
+    const mileage =
+    params.get("mileage");
+
+const fuelPrice =
+    params.get("fuelPrice");
+
+const budget =
+    params.get("budget");
+
+    if (start) {
+
+        document.getElementById(
+            "startLocation"
+        ).value = start;
+    }
+
+    if (destination) {
+
+        document.getElementById(
+            "destination"
+        ).value = destination;
+    }
+    if (mileage) {
+
+    document.getElementById(
+        "mileage"
+    ).value = mileage;
+}
+
+if (fuelPrice) {
+
+    document.getElementById(
+        "fuelPrice"
+    ).value = fuelPrice;
+}
+
+if (budget) {
+
+    document.getElementById(
+        "budget"
+    ).value = budget;
+}
+
+if (
+    start &&
+    destination &&
+    mileage &&
+    fuelPrice
+) {
+
+    setTimeout(() => {
+
+        document
+            .getElementById(
+                "planTripBtn"
+            )
+            .click();
+
+    }, 1000);
+}
+};
 
 /* =========================
    SAVE CLOUD TRIP
@@ -982,8 +1073,24 @@ saveTripBtn.addEventListener("click", async () => {
         return;
     }
 
-    await saveTripToCloud(currentTripData);
+   const privacyEnabled =
 
+    document.getElementById(
+        "privacyMode"
+    ).checked;
+
+if (privacyEnabled) {
+
+    alert(
+        "Privacy Mode enabled. Trip will not be saved to cloud."
+    );
+
+    return;
+}
+
+await saveTripToCloud(
+    currentTripData
+);
     alert("Trip saved successfully.");
 });
 
@@ -1526,4 +1633,138 @@ doc.text(
     doc.save(
         "roadwise-trip-report.pdf"
     );
+}
+function generateShareLink() {
+
+    const start =
+        encodeURIComponent(
+            document.getElementById(
+                "startLocation"
+            ).value
+        );
+
+    const destination =
+        encodeURIComponent(
+            document.getElementById(
+                "destination"
+            ).value
+        );
+
+    const mileage =
+        encodeURIComponent(
+            document.getElementById(
+                "mileage"
+            ).value
+        );
+
+    const fuelPrice =
+        encodeURIComponent(
+            document.getElementById(
+                "fuelPrice"
+            ).value
+        );
+
+    const budget =
+        encodeURIComponent(
+            document.getElementById(
+                "budget"
+            ).value
+        );
+
+    const shareUrl =
+
+`${window.location.origin}${window.location.pathname}?start=${start}&destination=${destination}&mileage=${mileage}&fuelPrice=${fuelPrice}&budget=${budget}`;
+
+    navigator.clipboard.writeText(
+        shareUrl
+    );
+
+    alert(
+        "Trip link copied to clipboard."
+    );
+}
+document
+    .getElementById("shareTripBtn")
+    .addEventListener(
+        "click",
+        generateShareLink
+    );
+
+
+function generatePackingChecklist(
+    weatherData
+) {
+
+    if (!weatherData) {
+
+        return;
+    }
+
+    const condition =
+        weatherData.weather[0]
+            .main
+            .toLowerCase();
+
+    const temp =
+        weatherData.main.temp;
+
+    const items = [];
+
+    if (
+        condition.includes("rain")
+    ) {
+
+        items.push(
+            "☔ Carry umbrella or raincoat"
+        );
+    }
+
+    if (temp >= 35) {
+
+        items.push(
+            "🧴 Carry water and sunscreen"
+        );
+    }
+
+    if (temp <= 15) {
+
+        items.push(
+            "🧥 Carry warm clothing"
+        );
+    }
+
+    if (
+        condition.includes("fog")
+        ||
+        condition.includes("mist")
+    ) {
+
+        items.push(
+            "🚘 Drive carefully in low visibility"
+        );
+    }
+
+    if (items.length === 0) {
+
+        items.push(
+            "✅ Weather conditions look normal"
+        );
+    }
+
+    document.getElementById(
+        "packing-checklist-container"
+    ).innerHTML = `
+
+        <div class="packing-card">
+
+            <h2>
+                🎒 Packing & Safety Checklist
+            </h2>
+
+            ${items.map(item =>
+                `<p>${item}</p>`
+            ).join("")}
+
+        </div>
+    `;
 }

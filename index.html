@@ -113,6 +113,114 @@
     <span id="loader" class="loader hidden"></span>
 </button>
 
+
+<!-- =========================
+     DESTINATION ENGINE
+========================= -->
+
+<section class="recommend-section">
+
+    <h2>
+        🌍 Destination Recommendation Engine
+    </h2>
+
+    <div class="recommend-form">
+
+
+        <select id="budgetSelect">
+
+            <option value="">
+                Select Budget
+            </option>
+
+            <option value="low">
+                Low
+            </option>
+
+            <option value="medium">
+                Medium
+            </option>
+
+            <option value="high">
+                High
+            </option>
+
+        </select>
+
+
+        <select id="vibeSelect">
+
+            <option value="">
+                Select Vibe
+            </option>
+
+            <option value="beach">
+                Beach
+            </option>
+
+            <option value="mountains">
+                Mountains
+            </option>
+
+            <option value="nature">
+                Nature
+            </option>
+
+            <option value="heritage">
+                Heritage
+            </option>
+
+            <option value="adventure">
+                Adventure
+            </option>
+
+            <option value="spiritual">
+                Spiritual
+            </option>
+
+        </select>
+
+
+        <select id="weatherSelect">
+
+            <option value="">
+                Preferred Weather
+            </option>
+
+            <option value="hot">
+                Hot
+            </option>
+
+            <option value="cold">
+                Cold
+            </option>
+
+            <option value="pleasant">
+                Pleasant
+            </option>
+
+        </select>
+
+
+
+
+
+        <button id="recommendBtn">
+
+            Recommend Destinations
+
+        </button>
+
+    </div>
+
+
+    <div
+        id="recommendResults"
+        class="restaurant-grid"
+    ></div>
+
+</section>
+
         </section>
 
         <!-- Map -->
@@ -155,6 +263,89 @@
             </div>
 
         </section>
+
+        <button
+    id="saveTripBtn"
+    class="primary-btn"
+>
+    Save Trip
+</button>
+
+<!-- =========================
+     SAVED TRIPS
+========================= -->
+
+<section class="saved-trips-section">
+
+    <div class="section-header">
+
+        <h2>Saved Trips</h2>
+
+    </div>
+
+    <div id="savedTripsContainer">
+
+        <p class="empty-state">
+            No saved trips yet.
+        </p>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     FUEL STOP ALERT
+========================= -->
+
+<section
+    id="fuelAlertSection"
+    class="fuel-alert hidden"
+>
+
+    <h2>
+        ⛽ Fuel Stop Recommendation
+    </h2>
+
+    <p id="fuelAlertText"></p>
+
+</section>
+
+<!-- =========================
+     FATIGUE ALERT
+========================= -->
+
+<section
+    id="fatigueAlertSection"
+    class="fatigue-alert hidden"
+>
+
+    <h2>
+        😴 Driver Fatigue Alert
+    </h2>
+
+    <p id="fatigueAlertText"></p>
+
+</section>
+
+<!-- =========================
+     RESTAURANT SUGGESTIONS
+========================= -->
+
+<section
+    id="restaurantSection"
+    class="restaurant-section hidden"
+>
+
+    <h2>
+        🍴 Food Stops Nearby
+    </h2>
+
+    <div
+        id="restaurantContainer"
+        class="restaurant-grid"
+    ></div>
+
+</section>
 
         <!-- Weather -->
         <section class="card weather-card">
@@ -265,6 +456,9 @@ src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
 <script src="js/auth.js"></script>
 
+<script src="js/cloudStorage.js"></script>
+
+<script src="data/destinations.js"></script>
 
 <!-- Main App -->
 

@@ -40,6 +40,36 @@ function updateTripResults(
 ========================= */
 
 function updateWeatherUI(weatherData) {
+if (
+
+    !weatherData ||
+
+    !weatherData.weather ||
+
+    !weatherData.main
+
+) {
+
+    document.getElementById(
+        "weatherInfo"
+    ).innerHTML = `
+
+        <div class="weather-error">
+
+            <h3>
+                ⚠ Weather Unavailable
+            </h3>
+
+            <p>
+                Unable to fetch weather
+                data for this destination.
+            </p>
+
+        </div>
+    `;
+
+    return;
+}
 
     const weatherContainer =
         document.getElementById('weatherInfo');

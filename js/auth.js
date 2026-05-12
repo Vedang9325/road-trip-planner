@@ -62,6 +62,8 @@ auth.onAuthStateChanged((user) => {
 
         document.getElementById("userAvatar")
             .src = user.photoURL;
+        
+        loadCloudTrips();
 
     } else {
 

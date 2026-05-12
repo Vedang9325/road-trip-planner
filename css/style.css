@@ -1209,3 +1209,35 @@ width: 320px;
 
     backdrop-filter: blur(12px);
 }
+
+#exportPdfBtn {
+
+    background: linear-gradient(
+        135deg,
+        #38bdf8,
+        #2563eb
+    );
+
+    border: none;
+
+    color: white;
+
+    padding: 14px 22px;
+
+    border-radius: 14px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+#exportPdfBtn:hover {
+
+    transform: translateY(-2px);
+
+    opacity: 0.9;
+}

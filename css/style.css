@@ -1341,3 +1341,55 @@ width: 320px;
     margin-bottom: 0px;
 }
 
+.location-input-wrapper {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+}
+
+.location-input-wrapper input {
+
+    width: 100%;
+
+    padding-right: 50px;
+}
+
+.location-btn {
+
+    position: absolute;
+
+    right: 14px;
+
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 1.1rem;
+
+    color: #38bdf8;
+
+    transition: 0.2s ease;
+}
+
+.location-btn:hover {
+
+    transform: scale(1.15);
+}
+
+.error-card {
+
+    background: rgba(255,0,0,0.08);
+
+    border: 1px solid rgba(255,0,0,0.2);
+
+    padding: 18px;
+
+    border-radius: 18px;
+
+    margin-top: 20px;
+}

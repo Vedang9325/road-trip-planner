@@ -71,15 +71,53 @@
 
             <h2>Trip Details</h2>
 
-            <div class="input-group">
-                <label>Starting Location</label>
-                <input type="text" id="startLocation" placeholder="e.g. Mumbai" />
-            </div>
+<div class="input-group">
 
-            <div class="input-group">
-                <label>Destination</label>
-                <input type="text" id="destination" placeholder="e.g. Goa" />
-            </div>
+    <label>Starting Location</label>
+
+    <div class="location-input-wrapper">
+
+        <input
+            type="text"
+            id="startLocation"
+            placeholder="e.g. Mumbai"
+        />
+
+        <button
+            type="button"
+            id="useCurrentLocationBtn"
+            class="location-btn"
+        >
+            📍
+        </button>
+
+    </div>
+
+</div>
+
+<div class="input-group">
+
+    <label>Destination</label>
+
+    <div class="location-input-wrapper">
+
+        <input
+            type="text"
+            id="destination"
+            placeholder="e.g. Goa"
+        />
+
+        <button
+            type="button"
+            id="useCurrentDestinationBtn"
+            class="location-btn"
+        >
+            📍
+        </button>
+
+    </div>
+
+</div>
 
             <!-- Stops Container -->
 
@@ -481,7 +519,7 @@
 
 <script src="js/app.js"></script>
 <script
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAy12Tz95BQtDtQbcIbTA85Ei1ETaY3h-Q&libraries=places">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxi4ANyUszdpTJN8zyrUNnv0zdpb_htF8&libraries=places">
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 

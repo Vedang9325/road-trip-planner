@@ -37,7 +37,37 @@ function initMap() {
     directionsRenderer.setMap(map);
 
     initAutocomplete();
-    
+document
+    .getElementById(
+        "useCurrentLocationBtn"
+    )
+    .addEventListener(
+
+        "click",
+
+        () => {
+
+            fillCurrentLocation(
+                "startLocation"
+            );
+        }
+    );
+
+document
+    .getElementById(
+        "useCurrentDestinationBtn"
+    )
+    .addEventListener(
+
+        "click",
+
+        () => {
+
+            fillCurrentLocation(
+                "destination"
+            );
+        }
+    );
 }
 
 /* =========================
@@ -119,7 +149,83 @@ function initAutocomplete() {
     new google.maps.places.Autocomplete(destinationInput);
 }
 
+function fillCurrentLocation(
+    inputId
+) {
 
+    if (!navigator.geolocation) {
+
+        alert(
+            "Geolocation not supported."
+        );
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        (position) => {
+
+            console.log(position);
+
+            const lat =
+                position.coords.latitude;
+
+            const lng =
+                position.coords.longitude;
+
+            const geocoder =
+                new google.maps.Geocoder();
+
+            geocoder.geocode(
+
+                {
+                    location: {
+                        lat,
+                        lng
+                    }
+                },
+
+                (results, status) => {
+
+                    console.log(results);
+
+                    if (
+                        status !== "OK"
+                    ) {
+
+                        alert(
+                            "Could not fetch address."
+                        );
+
+                        return;
+                    }
+
+                    document.getElementById(
+                        inputId
+                    ).value =
+                        results[0]
+                            .formatted_address;
+                }
+            );
+        },
+
+        (error) => {
+
+            console.error(error);
+
+            alert(
+                "Location access failed."
+            );
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
 /* =========================
    DARK MODE MAP STYLE
 ========================= */
@@ -400,7 +506,22 @@ async (result, status) => {
 
     if (status !== "OK") {
 
-        alert("Could not generate route.");
+        document.getElementById(
+    "route-comparison-container"
+).innerHTML = `
+
+<div class="error-card">
+
+    <h3>
+        ⚠ Route Generation Failed
+    </h3>
+
+    <p>
+        Please verify locations and try again.
+    </p>
+
+</div>
+`;
 
         hideLoading();
 
@@ -439,136 +560,160 @@ return {
     });
 
 
-    const midpointIndex =
-    Math.floor(
-        parsedRoutes[0]
-            .overviewPath.length / 2
+let coveredDistance = 0;
+
+let haltPoint = null;
+
+const totalRouteDistance =
+    routes[0].legs.reduce(
+        (sum, leg) =>
+            sum + leg.distance.value,
+        0
     );
 
-const midpoint =
-    parsedRoutes[0]
-        .overviewPath[midpointIndex];
+const targetDistance =
+    totalRouteDistance * 0.45;
 
-const geocoder =
-    new google.maps.Geocoder();
-    geocoder.geocode(
-{
-    location: midpoint
-},
+for (const leg of routes[0].legs) {
 
-async (results, status) => {
+    for (const step of leg.steps) {
 
-    if (status !== "OK") {
+        coveredDistance +=
+            step.distance.value;
 
-        console.error("Geocoder failed");
+        if (
+            coveredDistance >= targetDistance
+        ) {
 
-        return;
+            haltPoint =
+                step.end_location;
+
+            break;
+        }
     }
 
-    const cityResult =
-    results.find(result =>
+    if (haltPoint) {
+        break;
+    }
+}
 
-        result.types.includes("locality")
+/* fallback */
 
-        ||
+if (!haltPoint) {
 
-        result.types.includes(
-            "administrative_area_level_2"
-        )
-    );
-
-
-const haltCity =
-    cityResult.address_components[0]
-        .long_name;
-
-
-const breakCity =
-    cityResult.address_components[0]
-        .long_name;
-
-const weatherData =
-await getWeather(
-    midpoint.lat(),
-    midpoint.lng()
-)
-
+    haltPoint =
+        routes[0]
+            .legs[0]
+            .end_location;
+}
 
 const hotelRequest = {
 
-    query: `best hotels in ${haltCity}`,
+    location: haltPoint,
 
-    fields: [
-        "name",
-        "rating",
-        "formatted_address",
-        "geometry"
-    ]
+    radius: 12000,
+
+    keyword: "hotel",
+
+    type: "lodging"
 };
 
-placesService.findPlaceFromQuery(
+placesService.nearbySearch(
+
     hotelRequest,
 
     (results, status) => {
-
-
 
         if (
             status !==
             google.maps.places.PlacesServiceStatus.OK
         ) {
 
-            console.error("Hotel search failed");
+            console.error(
+                "Hotel search failed"
+            );
 
             return;
         }
-        document.getElementById(
-    "halt-recommendation-container"
-).innerHTML = "";
-        const hotel =
-    results[0];
-    const hotelLat =
-    hotel.geometry.location.lat();
 
-const hotelLng =
-    hotel.geometry.location.lng();
+        const filteredHotels =
+            results.filter(hotel =>
 
-const mapsUrl =
-    `https://www.google.com/maps/search/?api=1&query=${hotelLat},${hotelLng}`;
+                hotel.rating >= 4
+            );
+
+        if (
+            filteredHotels.length === 0
+        ) {
+
+            return;
+        }
+
+        if (
+    filteredHotels.length === 0
+) {
+
+    document.getElementById(
+        "halt-recommendation-container"
+    ).innerHTML = `
+
+        <div class="halt-card">
+
+            <h2>
+                🌙 Overnight Halt
+            </h2>
+
+            <p>
+                No suitable hotels found near this route segment.
+            </p>
+
+        </div>
+    `;
+
+    return;
+}
+
+const hotel =
+    filteredHotels[0];
+        const hotelLat =
+            hotel.geometry.location.lat();
+
+        const hotelLng =
+            hotel.geometry.location.lng();
+
+        const mapsUrl =
+`https://www.google.com/maps/search/?api=1&query=${hotelLat},${hotelLng}`;
 
 document.getElementById(
     "halt-recommendation-container"
 ).innerHTML = `
 
-    <div class="halt-card">
+<div class="halt-card">
 
-        <h2>
-            🌙 Recommended Overnight Halt
-        </h2>
+<h2>
+🌙 Recommended Overnight Halt
+</h2>
 
-        <p>
-            📍 ${haltCity}
-        </p>
+<p>
+📍 ${hotel.vicinity}
+</p>
 
-        <a
-    href="${mapsUrl}"
-    target="_blank"
-    class="hotel-link"
+<a
+href="${mapsUrl}"
+target="_blank"
+class="hotel-link"
 >
-    🏨 ${hotel.name}
+🏨 ${hotel.name}
 </a>
 
-        <p>
-            ⭐ ${hotel.rating || "N/A"}
-        </p>
+<p>
+⭐ ${hotel.rating || "N/A"}
+</p>
 
-    </div>
+</div>
 `;
     }
 );
-
-
-});
 const fastestRoute =
     parsedRoutes.reduce((prev, current) =>
         prev.durationMin < current.durationMin
@@ -734,32 +879,42 @@ async (results, status) => {
         return;
     }
 
-        const cityResult =
-            results.find(result =>
+const cityResult =
+    results.find(result =>
+        result.types.includes("locality")
+    )
 
-                result.types.includes("locality")
+    ||
 
-                ||
+    results.find(result =>
+        result.types.includes(
+            "administrative_area_level_2"
+        )
+    );
 
-                result.types.includes(
-                    "administrative_area_level_2"
-                )
-            );
+if (!cityResult) {
 
-        if (!cityResult) {
+    console.error(
+        "No halt city found"
+    );
 
-            return;
-        }
+    return;
+}
+
+const haltCity =
+    cityResult.formatted_address;
+
 const breakCity =
-    cityResult.address_components[0]
-        .long_name;
+    cityResult.formatted_address;
 
 const weatherData =
     await getWeather(
-        midpoint.lat(),
-        midpoint.lng()
+        point.lat(),
+        point.lng()
     );
-
+console.error(
+    "Weather API failed"
+);
 if (!weatherData) {
 
     return;
@@ -957,7 +1112,22 @@ const weatherData =
 
         console.error(error);
 
-        alert("Something went wrong.");
+        document.getElementById(
+    "route-comparison-container"
+).innerHTML = `
+
+<div class="error-card">
+
+    <h3>
+        ⚠ Unexpected Error
+    </h3>
+
+    <p>
+        Something went wrong while planning your trip.
+    </p>
+
+</div>
+`;
 
         hideLoading();
     }
@@ -1298,7 +1468,13 @@ function loadRestaurants(
                         return;
                     }
 
+                    if (
+    !results ||
+    results.length === 0
+) {
 
+    return;
+}
                     const place =
                         results[0];
 

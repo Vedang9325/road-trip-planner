@@ -119,6 +119,11 @@
 
 </div>
 
+            <div class="input-group">
+                <label>Departure Time</label>
+                <input type="time" id="departureTime" />
+            </div>
+
             <!-- Stops Container -->
 
 <div id="stopsContainer"></div>
@@ -286,6 +291,11 @@
             </div>
 
             <div class="card result-card">
+                <h3>ETA</h3>
+                <p id="etaResult">--</p>
+            </div>
+
+            <div class="card result-card">
                 <h3>⛽ Fuel Needed</h3>
                 <p id="fuelNeededResult">--</p>
             </div>
@@ -324,7 +334,25 @@
 
 <div id="halt-recommendation-container"></div>
 
-<div id="break-recommendation-container"></div>
+<!-- =========================
+     FOOD STOPS NEARBY
+========================= -->
+
+<section
+    id="restaurantSection"
+    class="restaurant-section hidden"
+>
+
+    <h2>
+        Food Stops Nearby
+    </h2>
+
+    <div
+        id="restaurantContainer"
+        class="restaurant-grid"
+    ></div>
+
+</section>
 
 <div id="route-weather-container"></div>
 
@@ -394,26 +422,6 @@
     </h2>
 
     <p id="fatigueAlertText"></p>
-
-</section>
-
-<!-- =========================
-     RESTAURANT SUGGESTIONS
-========================= -->
-
-<section
-    id="restaurantSection"
-    class="restaurant-section hidden"
->
-
-    <h2>
-        🍴 Food Stops Nearby
-    </h2>
-
-    <div
-        id="restaurantContainer"
-        class="restaurant-grid"
-    ></div>
 
 </section>
 

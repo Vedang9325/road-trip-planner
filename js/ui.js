@@ -5,6 +5,7 @@
 function updateTripResults(
     distanceKm,
     durationText,
+    etaText,
     fuelNeeded,
     fuelCost,
     remainingBudget
@@ -15,6 +16,9 @@ function updateTripResults(
 
     document.getElementById('timeResult')
         .textContent = durationText;
+
+    document.getElementById('etaResult')
+        .textContent = etaText;
 
     document.getElementById('fuelNeededResult')
         .textContent = `${fuelNeeded} L`;

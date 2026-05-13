@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: "1:121998583319:web:b820b695b363000c2bde52"
 };
 
-
+self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 /* =========================
    INITIALIZE FIREBASE
 ========================= */

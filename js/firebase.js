@@ -11,7 +11,6 @@ const firebaseConfig = {
   appId: "1:121998583319:web:b820b695b363000c2bde52"
 };
 
-self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 /* =========================
    INITIALIZE FIREBASE
 ========================= */
@@ -21,8 +20,3 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 const db = firebase.firestore();
-
-firebase.appCheck().activate(
-    "6LcgsecsAAAAALZAHMb5nlXcWR098vACcw4sSzMl",
-    true
-);
